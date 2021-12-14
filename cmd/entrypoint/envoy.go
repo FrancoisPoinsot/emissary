@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -25,6 +26,21 @@ func runEnvoy(ctx context.Context, envoyHUP chan os.Signal) error {
 	// Try to run envoy directly, but fallback to running it inside docker if there is
 	// no envoy executable available.
 	if IsEnvoyAvailable() {
+		go func() {
+			<-ctx.Done()
+			resp, err := http.Post("localhost:8001/drain_listeners?graceful", "", nil)
+			if err != nil {
+				dlog.Errorf(ctx, "envoy graceful shutdown call failed: %v\n", err)
+			} else if resp.StatusCode >= 400 {
+				dlog.Errorf(ctx, "envoy graceful shutdown call failed with status code %d \n", resp.StatusCode)
+			} else {
+				dlog.Infoln(ctx, "envoy graceful shutdown executed successfully ")
+			}
+		}()
+
+		// Don't interrupt the command in case of cancellation, let me handle that with the code above
+		ctx = dcontext.WithoutCancel(ctx)
+
 		cmd := subcommand(ctx, "envoy", GetEnvoyFlags()...)
 		if envbool("DEV_SHUTUP_ENVOY") {
 			cmd.Stdout = nil
