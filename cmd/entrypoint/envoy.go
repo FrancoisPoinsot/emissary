@@ -26,6 +26,7 @@ func runEnvoy(ctx context.Context, envoyHUP chan os.Signal) error {
 	// Try to run envoy directly, but fallback to running it inside docker if there is
 	// no envoy executable available.
 	if IsEnvoyAvailable() {
+		// gracefully shutdown envoy on context cancellation
 		go func() {
 			<-ctx.Done()
 			resp, err := http.Post("localhost:8001/drain_listeners?graceful", "", nil)
