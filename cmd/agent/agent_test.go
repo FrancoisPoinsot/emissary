@@ -36,7 +36,7 @@ func TestAgentE2E(t *testing.T) {
 	kubeconfig := dtest.KubeVersionConfig(ctx, dtest.Kube22)
 	cli, err := kates.NewClient(kates.ClientConfig{Kubeconfig: kubeconfig})
 	require.NoError(t, err)
-	// applies all k8s yaml to dtest cluter
+	// applies all k8s yaml to dtest cluster
 	// ambassador, ambassador-agent, rbac, crds, and a fake agentcom that implements the grpc
 	// server for the agent
 	setup(t, ctx, kubeconfig, cli)
