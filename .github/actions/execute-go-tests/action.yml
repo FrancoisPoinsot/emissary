@@ -36,7 +36,8 @@ runs:
         export TEST_XML_DIR=/tmp/test-logs/xml/
         export GOTEST_ARGS='-timeout 30m'
         mkdir -p ${TEST_XML_DIR}
-        make gotest GOTEST_PKGS=./cmd/agent GOTEST_ARGS="-run TestAgentE2E"
+        make gotest
+#        make gotest GOTEST_PKGS=./cmd/agent GOTEST_ARGS="-run TestAgentE2E"
 #        TODO: rm above
 #        make gotest
     - uses: ./.github/actions/git-dirty-check
